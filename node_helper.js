@@ -29,7 +29,7 @@ module.exports = NodeHelper.create({
       const results = await Promise.allSettled(
         feeds.map(f =>
           fetch(f.url, { signal: AbortSignal.timeout(timeout), headers: { 'User-Agent': 'MagicMirror' } })
-            .then(r => r.text())
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
             .then(xml => {
               const items = [];
               const re = /<(?:item|entry)[\s>]([\s\S]*?)<\/(?:item|entry)>/gi;
@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
                        || /<published[^>]*>([\s\S]*?)<\/published>/i.exec(b)
                        || /<updated[^>]*>([\s\S]*?)<\/updated>/i.exec(b);
                 if (!t || !l) continue;
-                items.push({ title: clean(t[1]).slice(0, C.MAX_TITLE_LENGTH), source: f.label, url: clean(l[1]), pubDate: d ? new Date(clean(d[1])).getTime() : Date.now(), color: f.color ?? '#ffffff' });
+                items.push({ title: clean(t[1]).slice(0, C.MAX_TITLE_LENGTH), source: f.label, url: clean(l[1]), pubDate: d ? new Date(clean(d[1])).getTime() || Date.now() : Date.now(), color: f.color ?? '#ffffff' });
               }
               console.log(`[MMM-LeanRSS] [HELPER] ${f.label}: ${items.length} items`);
               return items.slice(0, perFeed);
