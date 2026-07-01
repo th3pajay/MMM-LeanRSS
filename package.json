@@ -1,6 +1,6 @@
 {
   "name": "MMM-LeanRSS",
-"version": "0.1.25",
+"version": "0.1.26",
   "description": "Zero-dependency RSS ticker for MagicMirror²",
   "main": "MMM-LeanRSS.js",
   "keywords": ["MagicMirror", "RSS", "ticker", "newsfeed"],
