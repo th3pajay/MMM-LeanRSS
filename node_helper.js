@@ -19,7 +19,7 @@ module.exports = NodeHelper.create({
     this.isFetching = true;
     try {
       const { feeds, polling = {}, display = {} } = this.config;
-      const timeout = polling.fetchTimeout ?? C.DEFAULT_FETCH_TIMEOUT_MS;
+      const timeout = Math.max(polling.fetchTimeout ?? C.DEFAULT_FETCH_TIMEOUT_MS, 1000);
       const maxAgeMs = (polling.maxAgeHours ?? 0) * 3_600_000;
       const limit = display.maxItems ?? C.MAX_ITEMS;
       const base = Math.max(polling.updateInterval ?? C.DEFAULT_UPDATE_INTERVAL_MS, C.MIN_UPDATE_INTERVAL_MS);
@@ -29,7 +29,7 @@ module.exports = NodeHelper.create({
       const results = await Promise.allSettled(
         feeds.map(f =>
           fetch(f.url, { signal: AbortSignal.timeout(timeout), headers: { 'User-Agent': 'MagicMirror' } })
-            .then(r => r.text())
+            .then(r => { if (!r.ok) throw new Error(r.status); return r.text(); })
             .then(xml => {
               const items = [];
               const re = /<(?:item|entry)[\s>]([\s\S]*?)<\/(?:item|entry)>/gi;
@@ -42,7 +42,7 @@ module.exports = NodeHelper.create({
                        || /<published[^>]*>([\s\S]*?)<\/published>/i.exec(b)
                        || /<updated[^>]*>([\s\S]*?)<\/updated>/i.exec(b);
                 if (!t || !l) continue;
-                items.push({ title: clean(t[1]).slice(0, C.MAX_TITLE_LENGTH), source: f.label, url: clean(l[1]), pubDate: d ? new Date(clean(d[1])).getTime() : Date.now(), color: f.color ?? '#ffffff' });
+                items.push({ title: clean(t[1]).slice(0, C.MAX_TITLE_LENGTH), source: f.label ?? '', url: clean(l[1]), pubDate: d ? new Date(clean(d[1])).getTime() || Date.now() : Date.now(), color: f.color ?? '#ffffff' });
               }
               console.log(`[MMM-LeanRSS] [HELPER] ${f.label}: ${items.length} items`);
               return items.slice(0, perFeed);
@@ -66,7 +66,7 @@ module.exports = NodeHelper.create({
       if (items.length) { this.failures = 0; this.lastItems = items; }
       else this.failures = Math.min(this.failures + 1, C.MAX_CONSECUTIVE_FAILURES);
       this.sendSocketNotification('RSS_UPDATE', { items: this.lastItems, fetchedAt: Date.now() });
-      this.schedule(this.failures ? Math.min(base * 2 ** (this.failures - 1), C.MAX_BACKOFF_MS) : base);
+      this.schedule(this.failures ? Math.min(base * 2 ** (this.failures - 1), Math.max(C.MAX_BACKOFF_MS, base)) : base);
     } finally {
       this.isFetching = false;
     }

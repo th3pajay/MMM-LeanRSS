@@ -15,7 +15,7 @@
 .MMM-LeanRSS .mmm-rss .rss-ticker-track {
   will-change: transform;
   display: inline-flex; align-items: center; gap: 1.2em;
-  animation: mmm-rss-scroll 30s linear infinite;
+  animation: mmm-rss-scroll linear infinite;
 }
 .MMM-LeanRSS .mmm-rss .rss-ticker-track--ltr { animation-name: mmm-rss-scroll-ltr; }
 .MMM-LeanRSS .mmm-rss .rss-ticker-track--ttb,
