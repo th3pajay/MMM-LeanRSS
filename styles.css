@@ -24,6 +24,8 @@
 .MMM-LeanRSS .mmm-rss .rss-ticker-track--btt { animation-name: mmm-rss-scroll-btt; }
 .MMM-LeanRSS .mmm-rss .rss-ticker-track:not(.rss-ticker-track--no-pause):hover { animation-play-state: paused; }
 .MMM-LeanRSS .mmm-rss.mmm-rss--vertical { justify-content: center; mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); }
+.MMM-LeanRSS .mmm-rss.mmm-rss--ptf { justify-content: center; }
+.MMM-LeanRSS .mmm-rss.mmm-rss--ptf .rss-item { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
 .MMM-LeanRSS .mmm-rss .rss-item { display: inline-flex; align-items: center; gap: .35em; }
 .MMM-LeanRSS .mmm-rss .rss-source { color: var(--rss-item-color, var(--rss-text-secondary)); font-weight: 700; font-size: .75em; text-transform: uppercase; letter-spacing: .06em;

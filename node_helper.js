@@ -44,7 +44,7 @@ module.exports = NodeHelper.create({
                 if (!t || !l) continue;
                 items.push({ title: clean(t[1]).slice(0, C.MAX_TITLE_LENGTH), source: f.label ?? '', url: clean(l[1]), pubDate: d ? new Date(clean(d[1])).getTime() || Date.now() : Date.now(), color: f.color ?? '#ffffff' });
               }
-              console.log(`[MMM-LeanRSS] [HELPER] ${f.label}: ${items.length} items`);
+              console.log(`[MMM-LeanRSS] [HELPER] ${f.label ?? ''}: ${items.length} items`);
               return items.slice(0, perFeed);
             })
             .catch(e => { console.error(`[MMM-LeanRSS] [HELPER] ${f.label}: ${e.message}`); return []; })
@@ -64,7 +64,10 @@ module.exports = NodeHelper.create({
         .slice(0, limit);
 
       if (items.length) { this.failures = 0; this.lastItems = items; }
-      else this.failures = Math.min(this.failures + 1, C.MAX_CONSECUTIVE_FAILURES);
+      else {
+        this.failures = Math.min(this.failures + 1, C.MAX_CONSECUTIVE_FAILURES);
+        this.sendSocketNotification('RSS_ERROR', { message: 'all feeds failed or returned no items', failures: this.failures });
+      }
       this.sendSocketNotification('RSS_UPDATE', { items: this.lastItems, fetchedAt: Date.now() });
       this.schedule(this.failures ? Math.min(base * 2 ** (this.failures - 1), Math.max(C.MAX_BACKOFF_MS, base)) : base);
     } finally {
