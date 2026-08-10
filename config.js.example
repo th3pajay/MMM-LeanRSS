@@ -17,7 +17,7 @@
       separator:    "·",
       scale:        1.0,
       compact:      false,   // smaller padding and font
-      direction:    "rtl",   // "rtl" | "ltr" | "ttb" | "btt"
+      direction:    "rtl",   // "rtl" | "ltr" | "ttb" | "btt" | "ptf"
     },
     polling: {
       updateInterval: 300000,  // ms between re-fetches (min 60000)

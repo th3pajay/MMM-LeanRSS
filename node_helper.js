@@ -1,6 +1,6 @@
 'use strict';
 const NodeHelper = require('node_helper');
-const C = { DEFAULT_UPDATE_INTERVAL_MS: 300000, MIN_UPDATE_INTERVAL_MS: 60000, DEFAULT_FETCH_TIMEOUT_MS: 8000, MAX_ITEMS: 50, MAX_TITLE_LENGTH: 120, MAX_BACKOFF_MS: 60000, MAX_CONSECUTIVE_FAILURES: 5 };
+const C = { DEFAULT_UPDATE_INTERVAL_MS: 300000, MIN_UPDATE_INTERVAL_MS: 60000, DEFAULT_FETCH_TIMEOUT_MS: 8000, MAX_ITEMS: 50, MAX_TITLE_LENGTH: 120, MAX_CONSECUTIVE_FAILURES: 5 };
 
 function clean(s) {
   return s.replace(/^<!\[CDATA\[|\]\]>$/g, '').trim()
@@ -44,7 +44,7 @@ module.exports = NodeHelper.create({
                 if (!t || !l) continue;
                 items.push({ title: clean(t[1]).slice(0, C.MAX_TITLE_LENGTH), source: f.label ?? '', url: clean(l[1]), pubDate: d ? new Date(clean(d[1])).getTime() || Date.now() : Date.now(), color: f.color ?? '#ffffff' });
               }
-              console.log(`[MMM-LeanRSS] [HELPER] ${f.label}: ${items.length} items`);
+              console.log(`[MMM-LeanRSS] [HELPER] ${f.label ?? ''}: ${items.length} items`);
               return items.slice(0, perFeed);
             })
             .catch(e => { console.error(`[MMM-LeanRSS] [HELPER] ${f.label}: ${e.message}`); return []; })
@@ -59,14 +59,19 @@ module.exports = NodeHelper.create({
           let h = 5381;
           for (let j = 0; j < i.title.length; j++) h = ((h << 5) + h) ^ i.title.charCodeAt(j);
           const k = (h >>> 0).toString(16).slice(0, 8);
-          return (seen[k] ? false : (seen[k] = 1)) && (!maxAgeMs || Date.now() - i.pubDate <= maxAgeMs);
+          return (!maxAgeMs || Date.now() - i.pubDate <= maxAgeMs) && (seen[k] ? false : (seen[k] = 1));
         })
         .slice(0, limit);
 
       if (items.length) { this.failures = 0; this.lastItems = items; }
-      else this.failures = Math.min(this.failures + 1, C.MAX_CONSECUTIVE_FAILURES);
+      else {
+        this.failures = Math.min(this.failures + 1, C.MAX_CONSECUTIVE_FAILURES);
+        this.sendSocketNotification('RSS_ERROR', { message: 'all feeds failed or returned no items', failures: this.failures });
+      }
       this.sendSocketNotification('RSS_UPDATE', { items: this.lastItems, fetchedAt: Date.now() });
-      this.schedule(this.failures ? Math.min(base * 2 ** (this.failures - 1), Math.max(C.MAX_BACKOFF_MS, base)) : base);
+      this.schedule(this.failures ? Math.min(base * 2 ** (this.failures - 1), 8 * base) : base);
+    } catch {
+      this.schedule(C.DEFAULT_UPDATE_INTERVAL_MS);
     } finally {
       this.isFetching = false;
     }

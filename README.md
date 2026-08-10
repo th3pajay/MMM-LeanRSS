@@ -4,7 +4,7 @@ MagicMirror module for a zero-dependency scrolling RSS ticker.
 
 ![MagicMirror](https://img.shields.io/badge/MagicMirror-v2.33.0-blue)
 ![Node](https://img.shields.io/badge/Node-%3E%3D22-brightgreen)
-![Version](https://img.shields.io/badge/Version-0.1.26-green)
+![Version](https://img.shields.io/badge/Version-0.1.28-green)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 <p align="center">
@@ -51,7 +51,7 @@ No `npm install` needed — zero dependencies.
       separator:    "·",      // character between headlines
       scale:        1.0,      // CSS scale transform on the panel
       compact:      false,    // reduces padding and font size
-      direction:    "ttb",    // ticker animation direction "rtl" | "ltr" | "ttb" | "btt"  
+      direction:    "ttb",    // ticker animation direction "rtl" | "ltr" | "ttb" | "btt" | "ptf"  
     },
     polling: {
       updateInterval: 300000, // ms between re-fetches (min: 60000)
