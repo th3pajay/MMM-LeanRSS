@@ -1,6 +1,6 @@
 'use strict';
 const NodeHelper = require('node_helper');
-const C = { DEFAULT_UPDATE_INTERVAL_MS: 300000, MIN_UPDATE_INTERVAL_MS: 60000, DEFAULT_FETCH_TIMEOUT_MS: 8000, MAX_ITEMS: 50, MAX_TITLE_LENGTH: 120, MAX_BACKOFF_MS: 60000, MAX_CONSECUTIVE_FAILURES: 5 };
+const C = { DEFAULT_UPDATE_INTERVAL_MS: 300000, MIN_UPDATE_INTERVAL_MS: 60000, DEFAULT_FETCH_TIMEOUT_MS: 8000, MAX_ITEMS: 50, MAX_TITLE_LENGTH: 120, MAX_CONSECUTIVE_FAILURES: 5 };
 
 function clean(s) {
   return s.replace(/^<!\[CDATA\[|\]\]>$/g, '').trim()
@@ -59,7 +59,7 @@ module.exports = NodeHelper.create({
           let h = 5381;
           for (let j = 0; j < i.title.length; j++) h = ((h << 5) + h) ^ i.title.charCodeAt(j);
           const k = (h >>> 0).toString(16).slice(0, 8);
-          return (seen[k] ? false : (seen[k] = 1)) && (!maxAgeMs || Date.now() - i.pubDate <= maxAgeMs);
+          return (!maxAgeMs || Date.now() - i.pubDate <= maxAgeMs) && (seen[k] ? false : (seen[k] = 1));
         })
         .slice(0, limit);
 
@@ -69,7 +69,9 @@ module.exports = NodeHelper.create({
         this.sendSocketNotification('RSS_ERROR', { message: 'all feeds failed or returned no items', failures: this.failures });
       }
       this.sendSocketNotification('RSS_UPDATE', { items: this.lastItems, fetchedAt: Date.now() });
-      this.schedule(this.failures ? Math.min(base * 2 ** (this.failures - 1), Math.max(C.MAX_BACKOFF_MS, base)) : base);
+      this.schedule(this.failures ? Math.min(base * 2 ** (this.failures - 1), 8 * base) : base);
+    } catch {
+      this.schedule(C.DEFAULT_UPDATE_INTERVAL_MS);
     } finally {
       this.isFetching = false;
     }
