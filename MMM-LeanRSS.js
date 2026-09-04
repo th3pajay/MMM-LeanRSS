@@ -14,21 +14,15 @@ Module.register('MMM-LeanRSS', {
   scheduleTick() {
     clearTimeout(this.ptfTimer);
     if (this.config.display.direction !== 'ptf' || this.items.length < 2) return;
-    const spd = Math.max(this.config.display.scrollSpeed, 1), dwell = Math.max(this.items[this.ptfIdx].title.length * 8 / spd, 2) * 1000;
+    const spd = Math.max(this.config.display.scrollSpeed ?? 60, 1), dwell = Math.max(this.items[this.ptfIdx % this.items.length].title.length * 8 / spd, 2) * 1000;
     this.ptfTimer = setTimeout(() => { this.ptfIdx = (this.ptfIdx + 1) % this.items.length; this.updateDom(400); this.scheduleTick(); }, dwell);
   },
 
   getDom() {
     const d = this.config.display, wrap = document.createElement('div');
     wrap.className = 'mmm-rss' + (d.compact ? ' mmm-rss--compact' : '');
-    if (d.scale !== 1) wrap.style.transform = `scale(${d.scale})`;
+    if ((d.scale ?? 1) !== 1) wrap.style.transform = `scale(${d.scale})`;
     if (!this.items.length) { wrap.classList.add('mmm-rss--loading'); return wrap; }
-
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      const ul = document.createElement('ul'); ul.className = 'rss-static-list';
-      this.items.forEach(i => { const li = document.createElement('li'); li.textContent = i.title; ul.appendChild(li); });
-      wrap.appendChild(ul); return wrap;
-    }
 
     const mk = (cls, txt) => { const e = document.createElement('span'); e.className = cls; if (txt !== undefined) e.textContent = txt; return e; };
     const buildItem = item => {
@@ -39,6 +33,12 @@ Module.register('MMM-LeanRSS', {
       if (d.showAge) { const h = Math.floor((Date.now() - item.pubDate) / 3_600_000); span.appendChild(mk('rss-age', ` · ${h < 1 ? '<1h' : h + 'h'} ago`)); }
       return span;
     };
+
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      const ul = document.createElement('ul'); ul.className = 'rss-static-list';
+      this.items.forEach(i => { const li = document.createElement('li'); li.appendChild(buildItem(i)); ul.appendChild(li); });
+      wrap.appendChild(ul); return wrap;
+    }
 
     const dir = d.direction ?? 'rtl';
     if (dir === 'ptf') {
@@ -54,10 +54,10 @@ Module.register('MMM-LeanRSS', {
     const frag = document.createDocumentFragment();
     this.items.forEach((item, idx) => {
       frag.appendChild(buildItem(item));
-      if (!vertical && idx < this.items.length - 1) frag.appendChild(mk('rss-sep', d.separator));
+      if (!vertical && idx < this.items.length - 1) frag.appendChild(mk('rss-sep', d.separator ?? '•'));
     });
     track.append(frag, frag.cloneNode(true));
-    const spd = Math.max(d.scrollSpeed, 1), chars = this.items.reduce((n, i) => n + i.title.length + (d.showSource ? i.source.length + 3 : 0), 0) + (this.items.length - 1) * 2;
+    const spd = Math.max(d.scrollSpeed ?? 60, 1), chars = this.items.reduce((n, i) => n + i.title.length + (d.showSource ? i.source.length + 3 : 0), 0) + (this.items.length - 1) * 2;
     track.style.animationDuration = `${(vertical ? this.items.length * 35 : chars * 8) / spd}s`;
     wrap.appendChild(track);
     return wrap;
