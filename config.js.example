@@ -6,7 +6,7 @@
     feeds: [
       { url: "https://feeds.bbci.co.uk/news/rss.xml",          label: "BBC",      color: "#ff6b6b" },
       { url: "https://feeds.skynews.com/feeds/rss/home.xml",   label: "Sky",      color: "#4fc3f7" },
-      { url: "https://rss.app/feeds/xtreme-news.xml",          label: "AP",       color: "#a5d6a7" },
+      { url: "https://feeds.bbci.co.uk/news/technology/rss.xml", label: "Tech",    color: "#a5d6a7" },
     ],
     display: {
       maxItems:     20,      // headlines shown per full rotation
@@ -14,7 +14,7 @@
       pauseOnHover: true,
       showSource:   true,    // prepends [Label] in feed color
       showAge:      false,   // appends · 2h ago
-      separator:    "·",
+      separator:    "•",
       scale:        1.0,
       compact:      false,   // smaller padding and font
       direction:    "rtl",   // "rtl" | "ltr" | "ttb" | "btt" | "ptf"
@@ -23,7 +23,6 @@
       updateInterval: 300000,  // ms between re-fetches (min 60000)
       fetchTimeout:   8000,    // per-feed request timeout ms
       maxAgeHours:    24,      // drop items older than N hours (0 = off)
-      retryOnFailure: true,
     },
   }
 }

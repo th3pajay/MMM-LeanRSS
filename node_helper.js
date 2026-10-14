@@ -42,6 +42,7 @@ module.exports = NodeHelper.create({
                        || /<published[^>]*>([\s\S]*?)<\/published>/i.exec(b)
                        || /<updated[^>]*>([\s\S]*?)<\/updated>/i.exec(b);
                 if (!t || !l) continue;
+                if (items.length >= perFeed) break;
                 items.push({ title: clean(t[1]).slice(0, C.MAX_TITLE_LENGTH), source: f.label ?? '', url: clean(l[1]), pubDate: d ? new Date(clean(d[1])).getTime() || Date.now() : Date.now(), color: f.color ?? '#ffffff' });
               }
               console.log(`[MMM-LeanRSS] [HELPER] ${f.label ?? ''}: ${items.length} items`);

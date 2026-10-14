@@ -9,7 +9,7 @@ Module.register('MMM-LeanRSS', {
 
   start() { this.items = []; this.ptfIdx = 0; this.ptfTimer = null; this.sendSocketNotification('RSS_INIT', this.config); },
 
-  socketNotificationReceived(n, p) { if (n !== 'RSS_UPDATE') return; this.items = p.items; this.updateDom(); this.scheduleTick(); },
+  socketNotificationReceived(n, p) { if (n !== 'RSS_UPDATE') return; const sig = p.items.map(i => i.url).join(); if (sig === this.sig) return; this.sig = sig; this.items = p.items; this.updateDom(); this.scheduleTick(); },
 
   scheduleTick() {
     clearTimeout(this.ptfTimer);
@@ -26,7 +26,8 @@ Module.register('MMM-LeanRSS', {
 
     const mk = (cls, txt) => { const e = document.createElement('span'); e.className = cls; if (txt !== undefined) e.textContent = txt; return e; };
     const buildItem = item => {
-      const span = mk('rss-item');
+      const span = document.createElement('a');
+      span.className = 'rss-item'; span.href = item.url; span.target = '_blank';
       span.style.setProperty('--rss-item-color', item.color);
       if (d.showSource) span.appendChild(mk('rss-source', `[${item.source}] `));
       span.appendChild(mk('rss-title', item.title));
