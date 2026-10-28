@@ -4,7 +4,7 @@ A lean, zero-dependency RSS/Atom ticker for [MagicMirror²](https://magicmirror.
 
 ![MagicMirror](https://img.shields.io/badge/MagicMirror-v2.33.0-blue)
 ![Node](https://img.shields.io/badge/Node-%3E%3D22-brightgreen)
-![Version](https://img.shields.io/badge/Version-0.1.31-green)
+![Version](https://img.shields.io/badge/Version-0.1.32-green)
 ![License](https://img.shields.io/badge/License-MIT-lightgrey)
 
 <p align="center">
