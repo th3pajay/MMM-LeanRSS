@@ -1,41 +1,37 @@
 .MMM-LeanRSS { --rss-text-secondary: rgba(255,255,255,.58); --rss-text-muted: rgba(255,255,255,.45); }
 
 .MMM-LeanRSS .mmm-rss {
-  width: 100%; height: 2.2em; overflow: hidden; white-space: nowrap;
-  background: rgba(0,0,0,.45); border: 1px solid rgba(255,255,255,.1);
-  border-radius: 6px; padding: 0 20px;
-  font-size: .85em; color: rgba(255,255,255,.92); display: flex; align-items: center;
+  width: 100%; height: 2.2em; overflow: hidden; white-space: nowrap; contain: content;
+  padding: 0 4px; font-size: .85em; color: rgba(255,255,255,.92); display: flex; align-items: center;
   mask-image: linear-gradient(to right, transparent, black 4%, black 96%, transparent);
 }
 
-.MMM-LeanRSS .mmm-rss.mmm-rss--loading { color: var(--rss-text-muted); }
-.MMM-LeanRSS .mmm-rss.mmm-rss--compact { padding: 0 12px; font-size: .78em; }
+.MMM-LeanRSS .mmm-rss.mmm-rss--compact { font-size: .78em; }
 
 .MMM-LeanRSS .mmm-rss .rss-ticker-track {
-  will-change: transform;
-  display: inline-flex; align-items: center; gap: 1.2em;
+  will-change: translate;
+  display: inline-flex; align-items: center;
   animation: mmm-rss-scroll linear infinite;
 }
-.MMM-LeanRSS .mmm-rss .rss-ticker-track--ltr { animation-name: mmm-rss-scroll-ltr; }
+.MMM-LeanRSS .mmm-rss .rss-ticker-track--ltr,
+.MMM-LeanRSS .mmm-rss .rss-ticker-track--ttb { animation-direction: reverse; }
 .MMM-LeanRSS .mmm-rss .rss-ticker-track--ttb,
-.MMM-LeanRSS .mmm-rss .rss-ticker-track--btt { flex-direction: column; align-items: center; }
-.MMM-LeanRSS .mmm-rss .rss-ticker-track--ttb { animation-name: mmm-rss-scroll-ttb; }
-.MMM-LeanRSS .mmm-rss .rss-ticker-track--btt { animation-name: mmm-rss-scroll-btt; }
-.MMM-LeanRSS .mmm-rss .rss-ticker-track:not(.rss-ticker-track--no-pause):hover { animation-play-state: paused; }
+.MMM-LeanRSS .mmm-rss .rss-ticker-track--btt { flex-direction: column; align-items: center; --rss-to: 0 -50%; }
+.MMM-LeanRSS .mmm-rss .rss-ticker-track:not(.rss-ticker-track--no-pause):hover,
+.MMM-LeanRSS.rss-paused .rss-ticker-track { animation-play-state: paused; }
 .MMM-LeanRSS .mmm-rss.mmm-rss--vertical { justify-content: center; mask-image: linear-gradient(to bottom, transparent, black 10%, black 90%, transparent); }
 .MMM-LeanRSS .mmm-rss.mmm-rss--ptf { justify-content: center; }
-.MMM-LeanRSS .mmm-rss.mmm-rss--ptf .rss-item { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
+.MMM-LeanRSS .mmm-rss.mmm-rss--ptf .rss-item { animation: mmm-rss-wipe .9s cubic-bezier(.4,0,.2,1); }
+.MMM-LeanRSS .mmm-rss.mmm-rss--ptf :is(.rss-item, .rss-title) { max-width: 100%; overflow: hidden; text-overflow: ellipsis; }
 
-.MMM-LeanRSS .mmm-rss .rss-item { color: inherit; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: .35em; }
+.MMM-LeanRSS .mmm-rss .rss-item { color: inherit; text-decoration: none; cursor: pointer; display: inline-flex; align-items: center; gap: .35em; padding: .6em; }
 .MMM-LeanRSS .mmm-rss .rss-source { color: var(--rss-item-color, var(--rss-text-secondary)); font-weight: 700; font-size: .75em; text-transform: uppercase; letter-spacing: .06em;
   background: color-mix(in srgb, var(--rss-item-color, var(--rss-text-secondary)) 18%, transparent); padding: .1em .4em; border-radius: 3px; }
-.MMM-LeanRSS .mmm-rss .rss-age { color: var(--rss-text-muted); font-size: .82em; }
-.MMM-LeanRSS .mmm-rss .rss-sep { font-size: 0; display: inline-block; width: 0; height: .8em; border-left: 1px solid var(--rss-text-muted); margin: 0 .6em; vertical-align: middle; }
+.MMM-LeanRSS .mmm-rss .rss-age { color: var(--rss-text-muted); font-size: .7em; border: 1px solid rgba(255,255,255,.2); border-radius: 3px; padding: 0 .35em; }
+.MMM-LeanRSS .mmm-rss .rss-sep { display: inline-block; height: .8em; border-left: 1px solid var(--rss-text-muted); margin: 0 .6em; }
 
 .MMM-LeanRSS .mmm-rss .rss-static-list { list-style: none; margin: 0; padding: 0; max-height: 6em; overflow-y: auto; }
 .MMM-LeanRSS .mmm-rss .rss-static-list li { padding: 3px 0; color: var(--rss-text-secondary); }
 
-@keyframes mmm-rss-scroll     { from { transform: translateX(0); }    to { transform: translateX(-50%); } }
-@keyframes mmm-rss-scroll-ltr { from { transform: translateX(-50%); } to { transform: translateX(0); } }
-@keyframes mmm-rss-scroll-ttb { from { transform: translateY(0); }    to { transform: translateY(-50%); } }
-@keyframes mmm-rss-scroll-btt { from { transform: translateY(-50%); } to { transform: translateY(0); } }
+@keyframes mmm-rss-scroll { to { translate: var(--rss-to, -50% 0); } }
+@keyframes mmm-rss-wipe   { from { clip-path: inset(0 100% 0 0); } to { clip-path: inset(0); } }
